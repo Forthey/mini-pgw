@@ -18,7 +18,11 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_SOURCE_DIR}/bin/debug"
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/bin/release")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_COVERAGE "${CMAKE_CURRENT_SOURCE_DIR}/bin/coverage")
 
+
+message("Downloading and installing required dependencies...")
+
 include(dependencies/install_all.cmake)
+
 
 SET(SOURCE_FILES
         source/main.cpp
@@ -26,12 +30,16 @@ SET(SOURCE_FILES
         source/logger/ILogger.h
         source/logger/P7Logger.h
         source/logger/P7Logger.cpp
-        source/logger/LoggerFactory.cpp
         source/logger/LoggerFactory.h
+        source/logger/LoggerFactory.cpp
 
+#        source/socket_server/ISocketServer.h
+#        source/socket_server/UDPServer.h
+#        source/socket_server/UDPServer.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+
 
 target_compile_options(${PROJECT_NAME} PRIVATE
         $<$<CONFIG:Debug>:${CMAKE_CXX_FLAGS_DEBUG}>

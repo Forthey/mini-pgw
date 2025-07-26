@@ -18,9 +18,6 @@ namespace server {
     void P7Logger::log(LogLevel level, std::string const &message) {
         std::lock_guard lock(mutex_);
         switch (level) {
-            case LogLevel::Trace:
-                trace_->P7_TRACE(module_, TM("%s"), message.c_str());
-            break;
             case LogLevel::Debug:
                 trace_->P7_DEBUG(module_, TM("%s"), message.c_str());
             break;
@@ -43,9 +40,6 @@ namespace server {
         char const* file = std::filesystem::path(ctx.file).filename().c_str();
 
         switch (level) {
-            case LogLevel::Trace:
-                trace_->P7_TRACE(module_, TM("%s:%d (func %s):\t%s"), file, ctx.line, ctx.function, message.c_str());
-            break;
             case LogLevel::Debug:
                 trace_->P7_DEBUG(module_, TM("%s:%d (func %s):\t%s"), file, ctx.line, ctx.function, message.c_str());
             break;
@@ -63,14 +57,6 @@ namespace server {
             break;
         }
 
-    }
-
-    void P7Logger::trace(std::string const &message) {
-        log(LogLevel::Trace, message);
-    }
-
-    void P7Logger::trace(std::string const &message, LogContext const& ctx) {
-        log(LogLevel::Trace, message, ctx);
     }
 
     void P7Logger::debug(std::string const &message) {

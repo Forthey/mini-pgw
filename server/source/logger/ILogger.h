@@ -14,7 +14,6 @@ namespace server {
     };
 
     enum class LogLevel {
-        Trace,
         Debug,
         Info,
         Warning,
@@ -29,10 +28,6 @@ namespace server {
         virtual void log(LogLevel level, const std::string &message) = 0;
 
         virtual void log(LogLevel level, const std::string &message, LogContext const &ctx) = 0;
-
-        virtual void trace(std::string const &message) = 0;
-
-        virtual void trace(std::string const &message, LogContext const &ctx) = 0;
 
         virtual void debug(std::string const &message) = 0;
 

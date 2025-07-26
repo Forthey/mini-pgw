@@ -19,7 +19,7 @@ execute_process(
         COMMAND ${CMAKE_COMMAND} --build ${libp7_BINARY_DIR}
 )
 
-file(COPY ${libp7_SOURCE_DIR}/Headers DESTINATION ${libp7_BINARY_DIR}/Headers)
+file(COPY ${libp7_SOURCE_DIR}/Headers DESTINATION ${libp7_BINARY_DIR})
 
 add_library(P7::Headers INTERFACE IMPORTED)
 set_target_properties(P7::Headers PROPERTIES

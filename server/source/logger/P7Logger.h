@@ -24,10 +24,6 @@ namespace server {
 
         void log(LogLevel level, std::string const &message, LogContext const &ctx) override;
 
-        void trace(std::string const &message) override;
-
-        void trace(std::string const &message, LogContext const &ctx) override;
-
         void debug(std::string const &message) override;
 
         void debug(std::string const &message, LogContext const &ctx) override;
