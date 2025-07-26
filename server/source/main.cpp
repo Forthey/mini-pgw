@@ -4,5 +4,5 @@
 int main() {
     auto logger = server::LoggerFactory::getSingletonLogger("MainLogger");
 
-    logger->debug("Hello World!", WITH_CONTEXT);
+    logger->error("Hello World!", WITH_CONTEXT);
 }
