@@ -16,16 +16,9 @@ namespace server {
         IP7_Trace::hModule module_ = nullptr;
 
     public:
-        explicit P7Logger(std::string const &name = "AppLogger") {
-            client_ = P7_Create_Client(TM("/P7.Sink=FileTxt; /P7.Dir=./logs/"));
-            trace_ = P7_Create_Trace(client_, TM(name.c_str()));
-            trace_->Register_Module(TM(name.c_str()), &module_);
-        }
+        explicit P7Logger(std::string const &name = "AppLogger");
 
-        ~P7Logger() override {
-            if (trace_) trace_->Release();
-            if (client_) client_->Release();
-        }
+        ~P7Logger() override;
 
         void log(LogLevel level, std::string const &message) override;
 
