@@ -11,4 +11,6 @@ namespace server {
         virtual void startPolling() = 0;
     };
 }
+
+
 #endif //ISOCKETSERVER_H

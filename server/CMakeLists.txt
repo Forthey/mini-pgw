@@ -23,6 +23,7 @@ message("Downloading and installing required dependencies...")
 
 include(dependencies/install_all.cmake)
 
+include_directories(source)
 
 SET(SOURCE_FILES
         source/main.cpp
@@ -33,9 +34,9 @@ SET(SOURCE_FILES
         source/logger/LoggerFactory.h
         source/logger/LoggerFactory.cpp
 
-#        source/socket_server/ISocketServer.h
-#        source/socket_server/UDPServer.h
-#        source/socket_server/UDPServer.cpp
+        source/socket_server/ISocketServer.h
+        source/socket_server/UDPServer.h
+        source/socket_server/UDPServer.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
