@@ -37,6 +37,12 @@ SET(SOURCE_FILES
         source/socket_server/ISocketServer.h
         source/socket_server/UDPServer.h
         source/socket_server/UDPServer.cpp
+
+        source/session_manager/ISessionManager.h
+        source/session_manager/SessionManager.h
+        source/session_manager/SessionManager.cpp
+
+        source/models/IJsonModel.h
 )
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
