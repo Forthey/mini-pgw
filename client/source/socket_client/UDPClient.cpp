@@ -1,30 +1,57 @@
 #include "UDPClient.h"
 
+#include <fstream>
 #include <cstring>
 #include <format>
 #include <utility>
 #include <unistd.h>
 #include <fcntl.h>
+#include <sstream>
 #include <sys/epoll.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 
+#include "models/Config.h"
+
 
 namespace client {
-    UDPClient::UDPClient(std::string server_ip_address, std::uint16_t server_port, std::shared_ptr<ILogger> logger)
-        : server_ip_address_(std::move(server_ip_address)), server_port_(server_port), sock_fd_(-1),
+    UDPClient::UDPClient(std::string const &config_file_path, std::shared_ptr<ILogger> logger)
+        : sock_fd_(-1),
           logger_(std::move(logger)) {
         logger_->debug("Creating UDPClient instance", WITH_CONTEXT);
 
+        std::ifstream config_file(config_file_path);
+
+        if (not config_file.is_open()) {
+            logger_->critical(
+                std::format("Could not open config file {}", config_file_path), WITH_CONTEXT
+            );
+            throw std::invalid_argument("Could not open config file");
+        }
+
+        std::ostringstream buffer;
+        buffer << config_file.rdbuf();
+        std::string config_file_content = buffer.str();
+
+        buffer.clear();
+        config_file.close();
+
+        if (auto const err = ConfigParser().deserialize(config_file_content, client_config_); err.has_value()) {
+            logger_->critical(
+                std::format("Failed to parse config file: {}", err.value()), WITH_CONTEXT
+            );
+            throw std::invalid_argument("Failed to parse config file");
+        }
+
         server_binary_addr_ = {
             .sin_family = AF_INET,
-            .sin_port = htons(server_port_),
+            .sin_port = htons(client_config_.server_port),
         };
 
-        if (inet_pton(AF_INET, server_ip_address_.c_str(), &server_binary_addr_.sin_addr) <= 0) {
+        if (inet_pton(AF_INET, client_config_.server_ip.c_str(), &server_binary_addr_.sin_addr) <= 0) {
             logger_->critical(
-                std::format("Failed to parse ip address {}", server_ip_address_),WITH_CONTEXT
+                std::format("Failed to parse ip address {}", client_config_.server_ip),WITH_CONTEXT
             );
             throw std::invalid_argument("Failed to parse ip address");
         }
@@ -64,12 +91,18 @@ namespace client {
         }
 
         logger_->info(
-            std::format("UDP client configured, ready to send to {}:{}", server_ip_address_, server_port_),WITH_CONTEXT
+            std::format("UDP client configured, ready to send to {}:{}", client_config_.server_ip, client_config_.server_port),WITH_CONTEXT
         );
         return true;
     }
 
-    void UDPClient::send(UDPRequest const &request, std::uint16_t const timeout_ms, UDPCallback const &callback) {
+    void UDPClient::send(UDPRequest const &request, UDPCallback const &callback, std::uint16_t timeout_ms) {
+        logger_->info("Sending data to server...", WITH_CONTEXT);
+
+        if (timeout_ms == 0) {
+            timeout_ms = client_config_.response_timeout_sec * 1000;
+        }
+
         ssize_t bytes_sent = sendto(
             sock_fd_,
             request.data.c_str(),
@@ -81,13 +114,13 @@ namespace client {
 
         if (bytes_sent < 0) {
             logger_->error(
-                std::format("Ошибка отправки ({}): {}", errno, std::strerror(errno)), WITH_CONTEXT
+                std::format("Failed to send ({}): {}", errno, std::strerror(errno)), WITH_CONTEXT
             );
             return;
         }
 
         logger_->debug(
-            std::format("Sent {} bytes to the server {}:{}", bytes_sent, server_ip_address_, server_port_),
+            std::format("Sent {} bytes to the server {}:{}", bytes_sent, client_config_.server_ip, client_config_.server_port),
             WITH_CONTEXT
         );
 
@@ -174,7 +207,8 @@ namespace client {
                         buffer[bytes_received] = '\0';
 
                         callback({
-                            .data = buffer
+                            .data = buffer,
+                            .ctx = logger_
                         });
 
                         response_received = true;

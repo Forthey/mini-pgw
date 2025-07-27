@@ -7,9 +7,9 @@
 namespace client {
     class LoggerFactory {
     public:
-        static std::shared_ptr<ILogger> createLogger(std::string const &moduleName);
+        static std::shared_ptr<ILogger> createLogger(std::string const &name, std::string const &log_dir, std::string const& log_level);
 
-        static std::shared_ptr<ILogger> getSingletonLogger(std::string const &moduleName );
+        static std::shared_ptr<ILogger> getSingletonLogger();
     };
 } // namespace server
 

@@ -8,20 +8,21 @@
 
 #include "ISocketClient.h"
 #include "logger/ILogger.h"
+#include "models/Config.h"
 
 namespace client {
     class UDPClient : public ISocketClient {
-        std::string const server_ip_address_;
-        std::uint16_t server_port_;
         sockaddr_in server_binary_addr_;
         int sock_fd_;
         UDPCallback callback_;
 
         std::shared_ptr<ILogger> logger_;
 
+        Config client_config_;
+
         static int set_nonblocking(int fd);
     public:
-        UDPClient(std::string  server_ip_address, std::uint16_t server_port, std::shared_ptr<ILogger> logger);
+        UDPClient(std::string const &config_file_path, std::shared_ptr<ILogger> logger);
 
         UDPClient(UDPClient const &) = delete;
 
@@ -29,7 +30,7 @@ namespace client {
 
         bool setup();
 
-        void send(UDPRequest const& request, std::uint16_t timeout_ms, UDPCallback const& callback) override;
+        void send(UDPRequest const& request, UDPCallback const& callback, std::uint16_t timeout_ms) override;
     };
 }
 

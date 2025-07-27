@@ -3,12 +3,12 @@
 #include "P7Logger.h"
 
 namespace client {
-    std::shared_ptr<ILogger> LoggerFactory::createLogger(std::string const &moduleName) {
-        return std::make_shared<P7Logger>(moduleName);
+    std::shared_ptr<ILogger> LoggerFactory::createLogger(std::string const &name, std::string const &log_dir, std::string const& log_level) {
+        return std::make_shared<P7Logger>(name, log_dir, log_level);
     }
 
-    std::shared_ptr<ILogger> LoggerFactory::getSingletonLogger(std::string const &moduleName = "MainModule") {
-        static std::shared_ptr<ILogger> instance = std::make_shared<P7Logger>(moduleName);
+    std::shared_ptr<ILogger> LoggerFactory::getSingletonLogger() {
+        static std::shared_ptr<ILogger> instance = std::make_shared<P7Logger>("Main", "CONSOLE", "DEBUG");
         return instance;
     }
 }

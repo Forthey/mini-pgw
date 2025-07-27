@@ -36,6 +36,10 @@ SET(SOURCE_FILES
         source/socket_client/ISocketClient.h
         source/socket_client/UDPClient.h
         source/socket_client/UDPClient.cpp
+
+        source/models/IJsonModelDeserializer.h
+        source/models/Config.h
+        source/models/Config.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
