@@ -1,5 +1,6 @@
 #ifndef UDPSERVER_H
 #define UDPSERVER_H
+#include <atomic>
 #include <functional>
 #include <string>
 #include <cstdint>
@@ -25,8 +26,11 @@ namespace server {
     class UDPServer : public ISocketServer {
         std::uint16_t server_port_;
         int sock_fd_;
+        int event_fd_;
         int epoll_fd_;
         UDPCallback callback_;
+
+        std::atomic<bool> should_shutdown_;
 
         std::shared_ptr<ILogger> logger_;
 
@@ -42,6 +46,8 @@ namespace server {
         bool start() override;
 
         void startPolling() override;
+
+        void shutdown() override;
     };
 }
 

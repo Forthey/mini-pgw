@@ -1,6 +1,5 @@
 #ifndef SESSIONMANAGER_H
 #define SESSIONMANAGER_H
-#include <chrono>
 #include <unordered_map>
 #include <unordered_set>
 #include <thread>
@@ -11,14 +10,7 @@
 #include "logger/ILogger.h"
 
 namespace server {
-    using Clock = std::chrono::steady_clock;
-    using TimePoint = Clock::time_point;
-
-    struct SessionData {
-        TimePoint expiration_timestamp;
-    };
-
-    class SessionManager : public ISessionManager<std::string, SessionData> {
+    class SessionManager : public ISessionManager {
         std::mutex mutex_;
         std::condition_variable cv_;
 
@@ -48,7 +40,7 @@ namespace server {
 
         bool isBlacklisted(std::string const &imsi) const;
 
-        void shutdown(bool graceful);
+        void shutdown(bool graceful) override;
     };
 } // namespace server
 

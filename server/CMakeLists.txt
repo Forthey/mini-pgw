@@ -43,6 +43,12 @@ SET(SOURCE_FILES
         source/session_manager/SessionManager.cpp
 
         source/models/IJsonModel.h
+        source/models/http/HTTPExceptionResponse.h
+        source/models/http/HTTPExceptionResponse.cpp
+
+        source/http_server/IHTTPServer.h
+        source/http_server/HTTPlibServer.h
+        source/http_server/HTTPlibServer.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})

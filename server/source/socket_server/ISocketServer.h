@@ -9,6 +9,8 @@ namespace server {
         virtual bool start() = 0;
 
         virtual void startPolling() = 0;
+
+        virtual void shutdown() = 0;
     };
 }
 

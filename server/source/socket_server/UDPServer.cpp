@@ -4,14 +4,15 @@
 #include <format>
 #include <unistd.h>
 #include <fcntl.h>
-#include <sys/epoll.h>
-#include <arpa/inet.h>
 #include <sys/socket.h>
+#include <sys/epoll.h>
+#include <sys/eventfd.h>
 #include <netinet/in.h>
 
 namespace server {
     UDPServer::UDPServer(std::uint16_t const port, std::shared_ptr<ILogger> logger, UDPCallback callback)
-        : server_port_(port), sock_fd_(-1), epoll_fd_(-1), callback_(std::move(callback)), logger_(std::move(logger)) {
+        : server_port_(port), sock_fd_(-1), event_fd_(-1), epoll_fd_(-1), should_shutdown_(false), callback_(std::move(callback)),
+          logger_(std::move(logger)) {
         logger_->debug("Creating UDPServer instance", WITH_CONTEXT);
     }
 
@@ -78,7 +79,15 @@ namespace server {
         epoll_fd_ = epoll_create1(0);
         if (epoll_fd_ < 0) {
             logger_->critical(
-                std::format("Epoll create failed ({}): {}", errno, std::strerror(errno)),WITH_CONTEXT
+                std::format("Failed to create epoll ({}): {}", errno, std::strerror(errno)),WITH_CONTEXT
+            );
+            return false;
+        }
+
+        event_fd_ = eventfd(0, EFD_NONBLOCK);
+        if (event_fd_ < 0) {
+            logger_->critical(
+                std::format("Failed to create eventfd ({}): {}", errno, std::strerror(errno)),WITH_CONTEXT
             );
             return false;
         }
@@ -87,7 +96,17 @@ namespace server {
         ev.events = EPOLLIN | EPOLLET;
         ev.data.fd = sock_fd_;
         if (epoll_ctl(epoll_fd_, EPOLL_CTL_ADD, sock_fd_, &ev) < 0) {
-            perror("epoll_ctl");
+            logger_->critical(
+                std::format("Failed to manipulate epoll instance ({}): {}", errno, std::strerror(errno)),WITH_CONTEXT
+            );
+            return false;
+        }
+
+        ev.data.fd = event_fd_;
+        if (epoll_ctl(epoll_fd_, EPOLL_CTL_ADD, event_fd_, &ev) < 0) {
+            logger_->critical(
+                std::format("Failed to manipulate epoll instance ({}): {}", errno, std::strerror(errno)),WITH_CONTEXT
+            );
             return false;
         }
 
@@ -103,7 +122,7 @@ namespace server {
         char buffer[BUFFER_SIZE];
         epoll_event events[MAX_EVENTS];
 
-        while (true) {
+        while (not should_shutdown_) {
             logger_->debug("Polling for events", WITH_CONTEXT);
 
             int const n = epoll_wait(epoll_fd_, events, MAX_EVENTS, -1);
@@ -122,6 +141,13 @@ namespace server {
                 std::format("Received {} events", n), WITH_CONTEXT
             );
             for (int i = 0; i < n; ++i) {
+                if (events[i].data.fd == event_fd_) {
+                    uint64_t dummy;
+                    read(event_fd_, &dummy, sizeof(dummy));
+                    logger_->info("Stop signal received");
+                    return;
+                }
+
                 if (events[i].events & EPOLLIN) {
                     sockaddr_in client_addr{};
                     socklen_t client_len = sizeof(client_addr);
@@ -159,5 +185,14 @@ namespace server {
                 }
             }
         }
+    }
+
+    void UDPServer::shutdown() {
+        if (should_shutdown_) {
+            return;
+        }
+        logger_->info("Shutting down UDPServer gracefully...", WITH_CONTEXT);
+        std::uint64_t stop_signal = 1;
+        write(event_fd_, &stop_signal, sizeof(stop_signal));
     }
 }

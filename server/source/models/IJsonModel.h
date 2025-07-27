@@ -6,13 +6,12 @@
 namespace server {
     using ParseError = std::string;
 
-    class IJsonModel {
-    public:
+    struct IJsonModel {
         virtual ~IJsonModel() = default;
 
         virtual std::string serialize() const = 0;
 
-        virtual std::optional<ParseError> deserialize(const std::string& json) = 0;
+        virtual std::optional<ParseError> deserialize(std::string const& json) = 0;
     };
 } // namespace server
 

@@ -37,7 +37,9 @@ namespace server {
     }
 
     SessionManager::~SessionManager() {
-        shutdown(false);
+        if (not shutting_down_) {
+            SessionManager::shutdown(false);
+        }
         if (cleaner_thread_.joinable()) {
             cleaner_thread_.join();
         }
