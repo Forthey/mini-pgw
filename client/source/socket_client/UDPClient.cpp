@@ -12,14 +12,13 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
+#include "logger/LoggerFactory.h"
 #include "models/Config.h"
 
 
 namespace client {
-    UDPClient::UDPClient(std::string const &config_file_path, std::shared_ptr<ILogger> logger)
-        : sock_fd_(-1),
-          logger_(std::move(logger)) {
-        logger_->debug("Creating UDPClient instance", WITH_CONTEXT);
+    UDPClient::UDPClient(std::string const &config_file_path) : sock_fd_(-1) {
+        logger_ = LoggerFactory::getSingletonLogger();
 
         std::ifstream config_file(config_file_path);
 
@@ -43,6 +42,8 @@ namespace client {
             );
             throw std::invalid_argument("Failed to parse config file");
         }
+
+        logger_ = LoggerFactory::createLogger("Client", client_config_.log_dir, client_config_.log_level);
 
         server_binary_addr_ = {
             .sin_family = AF_INET,

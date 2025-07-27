@@ -7,17 +7,18 @@
 
 
 int main(int argc, char *argv[]) {
-    if (argc != 2) {
+    if (argc != 3) {
         std::cout << "Usage: " << argv[0] << " <config path> <imsi>" << std::endl;
+        return EXIT_FAILURE;
     }
 
     std::string const config_file_path = argv[1];
     std::string const IMSI = argv[2];
 
-    auto logger = client::LoggerFactory::createLogger("Main", "CONSOLE", "DEBUG");
+    auto logger = client::LoggerFactory::getSingletonLogger();
 
     try {
-        auto client = std::make_unique<client::UDPClient>(config_file_path, logger);
+        auto client = std::make_unique<client::UDPClient>(config_file_path);
 
         if (not client->setup()) {
             logger->critical("Failed to setup client");
@@ -30,6 +31,7 @@ int main(int argc, char *argv[]) {
                 std::format("Received from server: {}", response.data), WITH_CONTEXT
             );
         }, 0);
+
     } catch (std::exception const &e) {
         logger->critical(e.what(), WITH_CONTEXT);
     }
