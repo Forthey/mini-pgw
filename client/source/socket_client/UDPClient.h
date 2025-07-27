@@ -22,7 +22,7 @@ namespace client {
 
         static int set_nonblocking(int fd);
     public:
-        UDPClient(std::string const &config_file_path, std::shared_ptr<ILogger> logger);
+        UDPClient(std::string const &config_file_path);
 
         UDPClient(UDPClient const &) = delete;
 
