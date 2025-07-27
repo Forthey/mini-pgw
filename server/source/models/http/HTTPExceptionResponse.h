@@ -1,17 +1,18 @@
 #ifndef HTTPEXCEPTIONRESPONSE_H
 #define HTTPEXCEPTIONRESPONSE_H
-#include "models/IJsonModel.h"
+#include "models/IJsonModelSerializer.h"
 
 namespace server {
-    struct HTTPExceptionResponse : IJsonModel {
-        std::string detail_;
+    struct HTTPExceptionResponse {
+        std::string detail;
+    };
 
-        ~HTTPExceptionResponse() override = default;
+    class HTTPExceptionResponseParser : IJsonModelSerializer<HTTPExceptionResponse> {
+    public:
+        ~HTTPExceptionResponseParser() override = default;
 
-        std::string serialize() const override;
-
-        std::optional<ParseError> deserialize(const std::string &json) override;
+        std::string serialize(HTTPExceptionResponse const& model) const override;
     };
 } // namespace server
 
-#endif //HTTPEXCEPTIONRESPONSE_H
+#endif // HTTPEXCEPTIONRESPONSE_H

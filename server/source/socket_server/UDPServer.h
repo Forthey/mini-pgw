@@ -6,7 +6,7 @@
 #include <cstdint>
 #include <memory>
 
-#include "ISocketServer.h"
+#include "IServer.h"
 #include "logger/ILogger.h"
 
 namespace server {
@@ -23,7 +23,7 @@ namespace server {
     using UDPCallback = std::function<UDPResponse(UDPRequest const &)>;
 
 
-    class UDPServer : public ISocketServer {
+    class UDPServer : public IServer {
         std::uint16_t server_port_;
         int sock_fd_;
         int event_fd_;
@@ -43,9 +43,9 @@ namespace server {
 
         ~UDPServer() override;
 
-        bool start() override;
+        bool setup() override;
 
-        void startPolling() override;
+        void listen() override;
 
         void shutdown() override;
     };

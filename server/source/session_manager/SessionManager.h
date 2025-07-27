@@ -7,6 +7,7 @@
 #include <condition_variable>
 
 #include "ISessionManager.h"
+#include "cdr_writer/CdrWriter.h"
 #include "logger/ILogger.h"
 
 namespace server {
@@ -24,15 +25,17 @@ namespace server {
 
         std::shared_ptr<ILogger> logger_;
 
+        CdrWriter cdr_writer_;
+
 
         void cleanupLoop();
 
     public:
-        explicit SessionManager(int ttl_seconds, int graceful_shutdown_rate, std::shared_ptr<ILogger> logger);
+        explicit SessionManager(int ttl_seconds, int graceful_shutdown_rate, std::string const& cdr_file_path, std::shared_ptr<ILogger> logger);
 
         ~SessionManager() override;
 
-        void setBlacklist(std::unordered_set<std::string> blacklist);
+        void setBlacklist(std::vector<std::string> blacklist);
 
         bool upsertSession(std::string const &imsi) override;
 

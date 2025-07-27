@@ -36,7 +36,7 @@ namespace server {
         return fcntl(fd, F_SETFL, flags | O_NONBLOCK);
     }
 
-    bool UDPServer::start() {
+    bool UDPServer::setup() {
         logger_->info("Starting UDPServer...", WITH_CONTEXT);
 
         sock_fd_ = socket(AF_INET, SOCK_DGRAM, 0);
@@ -116,7 +116,7 @@ namespace server {
         return true;
     }
 
-    void UDPServer::startPolling() {
+    void UDPServer::listen() {
         constexpr int MAX_EVENTS = 10;
         constexpr int BUFFER_SIZE = 65536;
         char buffer[BUFFER_SIZE];

@@ -25,14 +25,15 @@ namespace server {
                 logger_->debug(
                     std::format("Session expired: {}", imsi), WITH_CONTEXT
                 );
+                cdr_writer_.write_data(imsi, "expired");
             }
         }
     }
 
     SessionManager::SessionManager(int const ttl_seconds, int const graceful_shutdown_rate,
-                                   std::shared_ptr<ILogger> logger)
+                                   std::string const& cdr_file_path, std::shared_ptr<ILogger> logger)
         : ttl_(std::chrono::seconds(ttl_seconds)), shutdown_rate_(graceful_shutdown_rate), shutting_down_(false),
-          logger_(std::move(logger)) {
+          logger_(std::move(logger)), cdr_writer_(cdr_file_path) {
         cleaner_thread_ = std::thread(&SessionManager::cleanupLoop, this);
     }
 
@@ -45,8 +46,10 @@ namespace server {
         }
     }
 
-    void SessionManager::setBlacklist(std::unordered_set<std::string> blacklist) {
-        blacklist_ = std::move(blacklist);
+    void SessionManager::setBlacklist(std::vector<std::string> blacklist) {
+        for (auto& imsi : blacklist) {
+            blacklist_.insert(std::move(imsi));
+        }
     }
 
     bool SessionManager::upsertSession(std::string const &imsi) {
@@ -63,7 +66,14 @@ namespace server {
             logger_->warn(
                 std::format("IMSI {} in blacklist, create session rejected", imsi), WITH_CONTEXT
             );
+            cdr_writer_.write_data(imsi, "rejected");
             return false;
+        }
+
+        if (active_sessions_.contains(imsi)) {
+            cdr_writer_.write_data(imsi, "extended");
+        } else {
+            cdr_writer_.write_data(imsi, "created");
         }
 
         active_sessions_[imsi] = SessionData{
@@ -89,7 +99,6 @@ namespace server {
         } {
             std::lock_guard lock(mutex_);
             if (shutting_down_) {
-                logger_->warn("Sessions shutdown has been called twice", WITH_CONTEXT);
                 return;
             }
             shutting_down_ = true;
@@ -116,6 +125,7 @@ namespace server {
                     logger_->debug(
                         std::format("Offloaded session: {}", imsi), WITH_CONTEXT
                     );
+                    cdr_writer_.write_data(imsi, "expired");
                 }
             }
 

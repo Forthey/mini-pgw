@@ -5,14 +5,14 @@
 
 #include <httplib.h>
 
-#include "IHTTPServer.h"
+#include "IServer.h"
 #include "logger/ILogger.h"
 #include "session_manager/ISessionManager.h"
 
 namespace server {
     using ShutdownFunc = std::function<void()>;
 
-    class HTTPlibServer : public IHTTPServer {
+    class HTTPlibServer : public IServer {
         httplib::Server server_;
         std::string const host_;
         std::uint16_t const port_;
@@ -32,6 +32,8 @@ namespace server {
             std::shared_ptr<ISessionManager> session_manager, ShutdownFunc shutdown_callback, std::shared_ptr<ILogger> logger);
 
         ~HTTPlibServer() override;
+
+        bool setup() override;
 
         void listen() override;
 

@@ -16,7 +16,7 @@ namespace server {
         IP7_Trace::hModule module_ = nullptr;
 
     public:
-        explicit P7Logger(std::string const &name = "AppLogger");
+        explicit P7Logger(std::string const &name, std::string const& log_dir, std::string const& log_level);
 
         ~P7Logger() override;
 

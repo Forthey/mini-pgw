@@ -10,11 +10,11 @@ namespace server {
     void HTTPlibServer::buildHTTPException(httplib::Response &res, std::uint16_t status_code,
                                            std::string const &detail) {
         res.status = status_code;
-        HTTPExceptionResponse response_model;
+        HTTPExceptionResponse const response_model = {
+            .detail = detail,
+        };
 
-        response_model.detail_ = detail;
-
-        res.set_content(response_model.serialize(), "application/json");
+        res.set_content(HTTPExceptionResponseParser().serialize(response_model), "application/json");
     }
 
     void HTTPlibServer::checkSubscriber(httplib::Request const &req, httplib::Response &res) const {
@@ -39,6 +39,13 @@ namespace server {
                                  ShutdownFunc shutdown_callback, std::shared_ptr<ILogger> logger)
         : host_(std::move(host)), port_(port), session_manager_(std::move(session_manager)),
           shutdown_callback_(std::move(shutdown_callback)), logger_(std::move(logger)) {
+    }
+
+    HTTPlibServer::~HTTPlibServer() {
+        server_.stop();
+    }
+
+    bool HTTPlibServer::setup() {
         server_.Get("/check_subscriber", [this](const httplib::Request &req, httplib::Response &res) {
             this->checkSubscriber(req, res);
         });
@@ -51,10 +58,8 @@ namespace server {
                 std::format("{} {} --> {}", req.method, req.path, res.status)
             );
         });
-    }
 
-    HTTPlibServer::~HTTPlibServer() {
-        server_.stop();
+        return true;
     }
 
     void HTTPlibServer::listen() {
