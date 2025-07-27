@@ -83,3 +83,5 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 foreach (library IN LISTS INSTALLED_LIBRARIES)
     target_link_libraries(${PROJECT_NAME} PRIVATE ${library})
 endforeach ()
+
+include(tests/build_tests.cmake)
