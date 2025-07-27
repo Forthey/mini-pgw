@@ -7,7 +7,7 @@
 
 #include "ILogger.h"
 
-namespace server {
+namespace client {
     class P7Logger : public ILogger {
         std::mutex mutex_;
 

@@ -4,7 +4,7 @@
 #pragma once
 #include <string>
 
-namespace server {
+namespace client {
 #define WITH_CONTEXT {.file=__FILE__, .line=__LINE__, .function=__FUNCTION__}
 
     struct LogContext {

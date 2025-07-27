@@ -5,7 +5,7 @@
 #include <unordered_map>
 
 
-namespace server {
+namespace client {
     P7Logger::P7Logger(std::string const &name, std::string const &log_dir,
                        std::string const& log_level) {
         std::pmr::unordered_map<std::string, std::uint8_t> const log_level_str_to_num = {

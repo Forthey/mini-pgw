@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(server)
+project(client)
 
 SET(CMAKE_CXX_STANDARD 20)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -29,29 +29,11 @@ SET(SOURCE_FILES
         source/logger/LoggerFactory.h
         source/logger/LoggerFactory.cpp
 
-        source/IServer.h
-        source/Server.h
-        source/Server.cpp
+        source/socket_client/ISocketClient.h
+        source/socket_client/UDPClient.h
+        source/socket_client/UDPClient.cpp
 
-        source/socket_server/UDPServer.h
-        source/socket_server/UDPServer.cpp
-
-        source/http_server/HTTPlibServer.h
-        source/http_server/HTTPlibServer.cpp
-
-        source/session_manager/ISessionManager.h
-        source/session_manager/SessionManager.h
-        source/session_manager/SessionManager.cpp
-
-        source/cdr_writer/CdrWriter.h
-        source/cdr_writer/CdrWriter.cpp
-        source/cdr_writer/FileHandler.h
-        source/cdr_writer/FileHandler.cpp
-
-        source/models/IJsonModelSerializer.h
         source/models/IJsonModelDeserializer.h
-        source/models/http/HTTPExceptionResponse.h
-        source/models/http/HTTPExceptionResponse.cpp
         source/models/Config.h
         source/models/Config.cpp
 )

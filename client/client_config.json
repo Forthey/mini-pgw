@@ -1,0 +1,7 @@
+{
+  "server_ip": "127.0.0.1",
+  "server_port": 9000,
+  "response_timeout_sec": 5,
+  "log_dir": "client_logs",
+  "log_level": "INFO"
+}

@@ -2,7 +2,7 @@
 
 #include "P7Logger.h"
 
-namespace server {
+namespace client {
     std::shared_ptr<ILogger> LoggerFactory::createLogger(std::string const &name, std::string const &log_dir, std::string const& log_level) {
         return std::make_shared<P7Logger>(name, log_dir, log_level);
     }
