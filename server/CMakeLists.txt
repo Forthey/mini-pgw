@@ -14,11 +14,6 @@ set(CMAKE_CXX_FLAGS_COVERAGE "-O0 -g --coverage" CACHE STRING "Флаги пок
 set(CMAKE_EXE_LINKER_FLAGS_DEBUG "-fsanitize=address" CACHE STRING "Флаги линковки отладки")
 set(CMAKE_EXE_LINKER_FLAGS_COVERAGE "--coverage" CACHE STRING "Флаги линковки покрытия")
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_SOURCE_DIR}/bin/debug")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/bin/release")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_COVERAGE "${CMAKE_CURRENT_SOURCE_DIR}/bin/coverage")
-
-
 message("Downloading and installing required dependencies...")
 
 include(dependencies/install_all.cmake)
@@ -79,6 +74,10 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
         $<$<CONFIG:Debug>:DEBUG_MODE=1>
         $<$<CONFIG:Release>:RELEASE_MODE=1>
         $<$<CONFIG:Coverage>:COVERAGE_MODE=1>
+)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin"
 )
 
 foreach (library IN LISTS INSTALLED_LIBRARIES)
